@@ -41,28 +41,31 @@ async def spammer(request):
 
     return json({"ah": "oh"})
 
-async def async_spammer_handler():
+
+
+async def spammerasync_handler(task_counter):
+    # start transactional db
     async with db.atomic_async() as tx:
         try:
             row_dicts = []
-            for i in range(50000):
-                row_dicts.append({'text': i})
+            for i in range(20000):
+                row_dicts.append({'text': task_counter})
 
             bulk_insert = TestModel.insert_many(row_dicts)
             await objects.execute(bulk_insert)
             print('insert db complete!')
         except peewee_async.IntegrityError:
+            # rollback insert if something when wrong
             tx.rollback()
 
 @app.route("/spammerasync")
 async def spammerasync(request):
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(
-            async_spammer_handler()
-        )
-    finally:
-        return json({"success": True})
+    # insert batch 50 * 20.000 = 1.000.000 data!
+    for i in range(50):
+        asyncio.ensure_future(spammerasync_handler(str(i)))
+    return json({"success": True})
+
+
 
 
 @app.route("/asyncmethod")
@@ -72,3 +75,6 @@ async def asyncmethod(request):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, workers=5)
+    # finish all running tasks:
+    # pending = asyncio.Task.all_tasks()
+    # loop.run_until_complete(asyncio.gather(*pending))
