@@ -1,0 +1,14 @@
+aiofiles==0.3.2
+aiomysql==0.0.16
+asyncpg==0.16.0
+httptools==0.0.11
+peewee==2.10.2
+peewee-async==0.5.12
+PyMySQL==0.8.1
+Represent==1.5.1
+sanic==0.7.0
+six==1.11.0
+SQLAlchemy==1.2.8
+ujson==1.35
+uvloop==0.10.1
+websockets==5.0.1
